@@ -151,11 +151,12 @@ class integral:
                     NewVelocityZ[i] = NewVelocityZ[i]*(-1)
             #print(NewPositionX[0])
         return NewPositionX,NewPositionY,NewPositionZ,NewVelocityX,NewVelocityY,NewVelocityZ
+"""
 class GetData(integral):
     def __init__(self,):
 
     def get_data()
-
+"""
 
 class plotting:
     "plotting class"
