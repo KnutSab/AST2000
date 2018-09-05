@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import random as random
+from numba import jit
 class integral:
     def __init__(self,a,b,m,T,my,N,Interval,Tau):
         self.a = a
@@ -96,9 +97,10 @@ class integral:
         a = self.a
         b = self.b
         N = self.N
-        x_position = [random.uniform(a, b) for i in range(N)]
-        y_position = [random.uniform(a, b) for i in range(N)]
-        z_position = [random.uniform(a, b) for i in range(N)]
+
+        x_position = np.random.uniform(a, b, N)
+        y_position = np.random.uniform(a, b, N)
+        z_position = np.random.uniform(a, b, N)
         return x_position,y_position,z_position
     def ParticleVelocity(self):
         k = self.k
@@ -107,14 +109,12 @@ class integral:
         N = self.N
         my = (0)
         sigma = np.sqrt((k*T)/m)
-        vel_x = np.zeros(N)
-        vel_y = np.zeros(N)
-        vel_z = np.zeros(N)
-        for i in range(N):
-            vel_x[i] = random.gauss(self.my,sigma)
-            vel_y[i] = random.gauss(self.my,sigma)
-            vel_z[i] = random.gauss(self.my,sigma)
+        vel_x = np.random.normal(self.my, sigma, N)
+        vel_y = np.random.normal(self.my, sigma, N)
+        vel_z = np.random.normal(self.my, sigma, N)
+
         return vel_x,vel_y,vel_z
+
     def PositionVelocityUpdate(self):
         N = self.N
         Interval = self.Interval
@@ -122,42 +122,65 @@ class integral:
         a = self.a
         b = self.b
         m = self.m
-        Box = integral(0,1e-6,3.3474472*10**(-27),3e5,0,1000,int(1e5),1e-13)
-        NewPositionX = Box.ParticlePosition()[0]
-        NewPositionY = Box.ParticlePosition()[1]
-        NewPositionZ = Box.ParticlePosition()[2]
-        NewVelocityX = Box.ParticleVelocity()[0]
-        NewVelocityY = Box.ParticleVelocity()[1]
-        NewVelocityZ = Box.ParticleVelocity()[2]
+        #Box = integral(0,1e-6,3.3474472*10**(-27),3e5,0,1,int(1e5),1e-13)
+        NewPositionX = self.ParticlePosition()[0]
+        NewPositionY = self.ParticlePosition()[1]
+        NewPositionZ = self.ParticlePosition()[2]
+        NewVelocityX = self.ParticleVelocity()[0]
+        NewVelocityY = self.ParticleVelocity()[1]
+        NewVelocityZ = self.ParticleVelocity()[2]
         F = 0
         Esc = 0
 
-        for n in range(Interval):
-            NewPositionX = NewPositionX+NewVelocityX*Tau
-            NewPositionY = NewPositionY+NewVelocityY*Tau
-            NewPositionZ = NewPositionZ+NewVelocityZ*Tau
-            #NewVelocityX[NewPositionX > b]
+        @jit(nopython=True)
+        def integrate(Interval, NewPositionX, NewPositionY, NewPositionZ, NewVelocityX, NewVelocityY, NewVelocityZ, F, Esc, Tau, a, b, m):
+            for n in range(Interval):
+                NewPositionX = NewPositionX+NewVelocityX*Tau
+                NewPositionY = NewPositionY+NewVelocityY*Tau
+                NewPositionZ = NewPositionZ+NewVelocityZ*Tau
+                #NewVelocityX[NewPositionX > b]
 
-            for i in range(N):
-                if NewPositionX[i] >= 0.25*b and NewPositionX[i] <= (0.75*b) and NewPositionY[i] >= 0.25*b and NewPositionY[i] <= (0.75*b):
-                    F = (m*(abs(NewVelocityZ[i])))/Tau
-                    Esc += 1
+                for i in range(N):
+                    if NewPositionX[i] >= 0.25*b and NewPositionX[i] <= (0.75*b) and NewPositionY[i] >= 0.25*b and NewPositionY[i] <= (0.75*b):
+                        F = (m*(abs(NewVelocityZ[i])))/Tau
+                        Esc += 1
 
-                if NewPositionX[i] >= b or NewPositionX[i] <= a:
-                    NewVelocityX[i] = NewVelocityX[i]*(-1)
-                elif NewPositionY[i] >= b or NewPositionY[i] <= a:
-                    NewVelocityY[i] = NewVelocityY[i]*(-1)
-                elif NewPositionZ[i] >= b or NewPositionZ[i] <= a:
-                    NewVelocityZ[i] = NewVelocityZ[i]*(-1)
-            #print(NewPositionX[0])
-        return NewPositionX,NewPositionY,NewPositionZ,NewVelocityX,NewVelocityY,NewVelocityZ
+                    if NewPositionX[i] >= b or NewPositionX[i] <= a:
+                        NewVelocityX[i] = NewVelocityX[i]*(-1)
+                    elif NewPositionY[i] >= b or NewPositionY[i] <= a:
+                        NewVelocityY[i] = NewVelocityY[i]*(-1)
+                    elif NewPositionZ[i] >= b or NewPositionZ[i] <= a:
+                        NewVelocityZ[i] = NewVelocityZ[i]*(-1)
+
+            return NewPositionX,NewPositionY,NewPositionZ,NewVelocityX,NewVelocityY,NewVelocityZ,F
+
+        return integrate(Interval, NewPositionX, NewPositionY, NewPositionZ, NewVelocityX, NewVelocityY, NewVelocityZ, F, Esc, Tau, a, b, m)
+
+    def BoxForceCounter(self):
+
+        func = self.PositionVelocityUpdate()
+        force = func[6]
+        total_force = 0
+        number = 0
+        total_force = 1e5*9.81
+        number = (total_force/force)
+        """while total_force <= ((1e5)*9.81):
+            total_force += force
+            number +=1
+            print(number)"""
+        return total_force, number
+
+    def FuelConsup(self):
+        BoxForec = self.BoxForceCounter()
+        massBoxsec = BoxForec[1]*self.m*self.N/self.Tau
+        return(massBoxsec)
 """
-class GetData(integral):
+#class GetData(integral):
     def __init__(self,):
 
     def get_data()
-"""
 
+"""
 class plotting:
     "plotting class"
     def __init__(self,x,fx,xlabel,ylabel,graph_text):
@@ -175,4 +198,3 @@ class plotting:
         plt.xlabel(self.xlabel)
         plt.ylabel(self.ylabel)
         plt.show()
-
