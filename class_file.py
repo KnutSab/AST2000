@@ -174,3 +174,4 @@ class plotting:
         plt.xlabel(self.xlabel)
         plt.ylabel(self.ylabel)
         plt.show()
+#lol
