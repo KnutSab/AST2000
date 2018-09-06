@@ -175,13 +175,7 @@ class integral:
         NperStep = self.PositionVelocityUpdate()[7]
         massBoxsec = BoxForec[1]*self.m*NperStep
         return(massBoxsec)
-"""
-#class GetData(integral):
-    def __init__(self,):
 
-    def get_data()
-
-"""
 class plotting:
     "plotting class"
     def __init__(self,x,fx,xlabel,ylabel,graph_text):
