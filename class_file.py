@@ -172,7 +172,8 @@ class integral:
 
     def FuelConsup(self):
         BoxForec = self.BoxForceCounter()
-        massBoxsec = BoxForec[1]*self.m*self.N/self.Tau
+        NperStep = self.PositionVelocityUpdate()[7]
+        massBoxsec = BoxForec[1]*self.m*NperStep
         return(massBoxsec)
 """
 #class GetData(integral):
