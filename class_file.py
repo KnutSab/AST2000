@@ -152,7 +152,7 @@ class integral:
                     elif NewPositionZ[i] >= b or NewPositionZ[i] <= a:
                         NewVelocityZ[i] = NewVelocityZ[i]*(-1)
 
-            return NewPositionX,NewPositionY,NewPositionZ,NewVelocityX,NewVelocityY,NewVelocityZ,F
+            return NewPositionX,NewPositionY,NewPositionZ,NewVelocityX,NewVelocityY,NewVelocityZ,F, Esc
 
         return integrate(Interval, NewPositionX, NewPositionY, NewPositionZ, NewVelocityX, NewVelocityY, NewVelocityZ, F, Esc, Tau, a, b, m)
 
@@ -160,14 +160,8 @@ class integral:
 
         func = self.PositionVelocityUpdate()
         force = func[6]
-        total_force = 0
-        number = 0
         total_force = 1e5*9.81
         number = (total_force/force)
-        """while total_force <= ((1e5)*9.81):
-            total_force += force
-            number +=1
-            print(number)"""
         return total_force, number
 
     def FuelConsup(self):
@@ -175,7 +169,31 @@ class integral:
         NperStep = self.PositionVelocityUpdate()[7]
         massBoxsec = BoxForec[1]*self.m*NperStep
         return(massBoxsec)
+    def InitialRocketMass(self):
+        RocketMass = self.BoxForceCounter()[1]*self.N*self.m #kg
+        satelite_mass = 1100 #kg
+        excess_fuel = 0 #kg
+        sum_mass = RocketMass+satelite_mass+excess_fuel
+        return(sum_mass)
+    def EscapeVelocity(self):
+        G = 6.67e-11 #Gravitasjonskonstanten m^3k^-1s^-2 (Nm^2/kg^2)
+        r = 8598366.6945 #radius, planet
+        SM = 7.68631952e-6 #Masse planet i solmasser
+        M = 1.98892e30*SM #Masse planet i kg
+        V = np.sqrt((2*G*M)/r) #Utslippshastighet
+        print(V)
+    def TimeToEscapeVel(self):
+        while i <= self.EscapeVelocity():
+            self.PositionVelocityUpdate()[5]
 
+
+"""
+#class GetData(integral):
+    def __init__(self,):
+
+    def get_data()
+
+"""
 class plotting:
     "plotting class"
     def __init__(self,x,fx,xlabel,ylabel,graph_text):
