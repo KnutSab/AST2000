@@ -160,9 +160,9 @@ class integral:
 
         func = self.PositionVelocityUpdate()
         force = func[6]
-        force_needed = 1e5*9.81
+        total_force = 1e5*9.81
         number = (total_force/force)
-        return total_force, number,
+        return total_force, number
 
     def FuelConsup(self):
         BoxForec = self.BoxForceCounter()
@@ -183,22 +183,19 @@ class integral:
         V = np.sqrt((2*G*M)/r) #Utslippshastighet
         print(V)
     def TimeToEscapeVel(self):
-        RocketVelocity = 0
-        Coiunter = 0
-        while RocketVelocity <= self.EscapeVelocity():
-            aks = self.PositionVelocityUpdate()[6]/self.InitialRocketMass()
-            print(aks)
-            RocketVelocity += self.PositionVelocityUpdate()*self.Tau
-            Counter += 1
-        return(Counter, RocketVelocity)
+        rocket_velocity = 0
+        counter = 0
+        while rocket_velocity <= self.EscapeVelocity():
+            rocket_acceleration = self.BoxForceCounter()[0]/self.InitialRocketMass()
+            rocket_velocity += rocket_acceleration*self.Tau
+            counter += 1
+
 
 
 """
 #class GetData(integral):
     def __init__(self,):
-
-    def get_data()
-
+    def get_data()s
 """
 class plotting:
     "plotting class"
