@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random as random
 from numba import jit
+
+
 class integral:
     def __init__(self,a,b,m,T,my,N,Interval,Tau):
         self.a = a
@@ -157,42 +159,61 @@ class integral:
         return integrate(Interval, NewPositionX, NewPositionY, NewPositionZ, NewVelocityX, NewVelocityY, NewVelocityZ, F, Esc, Tau, a, b, m)
 
     def BoxForceCounter(self):
-
         func = self.PositionVelocityUpdate()
         force = func[6]
-        force_needed = 1e5*9.81
-        number = (total_force/force)
-        return total_force, number,
+        total_force_for_lift = 1e5*(6.6742e-11*(1.5287e25/8598366.6945**2)) #m/s^2)
+        number = 1.4e18
+        total_force = number*force
+        return total_force_for_lift,  total_force, number
 
     def FuelConsup(self):
         BoxForec = self.BoxForceCounter()
         NperStep = self.PositionVelocityUpdate()[7]
         massBoxsec = BoxForec[1]*self.m*NperStep
         return(massBoxsec)
+
     def InitialRocketMass(self):
-        RocketMass = self.BoxForceCounter()[1]*self.N*self.m #kg
+        #RocketMass = self.BoxForceCounter()[2]*self.N*self.m #kg
         satelite_mass = 1100 #kg
-        excess_fuel = 0 #kg
-        sum_mass = RocketMass+satelite_mass+excess_fuel
+        excess_fuel = 30*10**3 #kg
+        sum_mass = satelite_mass+excess_fuel
         return(sum_mass)
+
     def EscapeVelocity(self):
         G = 6.67e-11 #Gravitasjonskonstanten m^3k^-1s^-2 (Nm^2/kg^2)
-        r = 8598366.6945 #radius, planet
+        r = 8598366.6945 #radius, planet m
         SM = 7.68631952e-6 #Masse planet i solmasser
         M = 1.98892e30*SM #Masse planet i kg
         V = np.sqrt((2*G*M)/r) #Utslippshastighet
-        print(V)
-    def TimeToEscapeVel(self):
-        RocketVelocity = 0
-        Coiunter = 0
-        while RocketVelocity <= self.EscapeVelocity():
-            aks = self.PositionVelocityUpdate()[6]/self.InitialRocketMass()
-            print(aks)
-            RocketVelocity += self.PositionVelocityUpdate()*self.Tau
-            Counter += 1
-        return(Counter, RocketVelocity)
+        return(V)
 
+    def TimeToEscapeVel(self, rocket_velocity):
+        self.rocket_velocity = rocket_velocity
+        g = 6.6742e-11*(1.5287e25/8598366.6945**2) #m/s^2
 
+        sum_force =self.BoxForceCounter()[1] - g
+        aks = sum_force/self.InitialRocketMass()
+        counter = 0
+        esc_vel = self.EscapeVelocity()
+        time_sek = (esc_vel-rocket_velocity)/aks
+        return time_sek
+
+    def OneDimensionalLaunch(self):
+        time = self.TimeToEscapeVel(0)
+        g = 6.6742e-11*(1.5287e25/8598366.6945**2) #m/s^2
+        sum_force =self.BoxForceCounter()[1] - g
+        aks = sum_force/self.InitialRocketMass()
+        dt = 0.01
+        #print(time)
+        velocity_array = np.zeros(int(time)+1)
+        position_array = np.zeros(int(time)+1)
+        time_array = np.zeros(int(time)+1)
+        print(time)
+        for i in range(int(time)):
+            velocity_array[i+1] = velocity_array[i] + aks*dt
+            position_array[i+1] = position_array[i] + velocity_array[i+1]*dt
+            time_array[i+1] = time_array[i]+1
+        return velocity_array, position_array, time_array
 """
 #class GetData(integral):
     def __init__(self,):
