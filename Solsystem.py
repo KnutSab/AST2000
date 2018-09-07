@@ -13,14 +13,15 @@ dNdt = cl.FuelConsup()
 m_fuel = cl.InitialRocketMass()[1]
 T_launch = cl.TimeToEscapeVel()
 launch_pos = np.array(r,cl.OneDimensionalLaunch()[1][0])
+t_launch = 0
 
 dpdt, N_box, dNdt, m_fuel = engine_simulation()
 T_launch, launch_pos, t_launch = get_launch_parameters()
 
 System.engine_settings(dpdt, N_box, dNdt, m_fuel, T_launch, launch_pos, t_launch)
-"""
 final_launch_pos = launch_simulation(T_launch, launch_pos, t_launch)
 System.mass_needed_launch(final_launch_pos, test=True)
+"""
 System.take_picture(picture_name)
 dlambda1, dlamda2 = System.measure_doppler_shifts()
 dist = System.analyse_distances()
