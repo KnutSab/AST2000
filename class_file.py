@@ -96,6 +96,7 @@ class integral:
             int_array[j] = ((f_start+f_end)/2)*dx
         return (np.sum(x_array*int_array)) #sums up all rectangles to approch integral, probability for a particle to have v_x
     def ParticlePosition(self):
+        "Gives us the three-dimentional position of all the particles"
         a = self.a
         b = self.b
         N = self.N
@@ -104,7 +105,9 @@ class integral:
         y_position = np.random.uniform(a, b, N)
         z_position = np.random.uniform(a, b, N)
         return x_position,y_position,z_position
+    
     def ParticleVelocity(self):
+        "Gives us the three-dimentional velocity of all the particles"
         k = self.k
         T = self.T
         m = self.m
@@ -118,6 +121,7 @@ class integral:
         return vel_x,vel_y,vel_z
 
     def PositionVelocityUpdate(self):
+        "Updates the position and velocity of all the particles, and gives us the force of one box and the number of particles that escape per second from that box"
         N = self.N
         Interval = self.Interval
         Tau = self.Tau
