@@ -173,11 +173,10 @@ class integral:
         return(massBoxsec)
 
     def InitialRocketMass(self):
-        #RocketMass = self.BoxForceCounter()[2]*self.N*self.m #kg
         satelite_mass = 1100 #kg
-        excess_fuel = 30*10**3 #kg
-        sum_mass = satelite_mass+excess_fuel
-        return(sum_mass)
+        fuel = 30*10**3 #kg
+        sum_mass = satelite_mass+fuel
+        return sum_mass, fuel
 
     def EscapeVelocity(self):
         G = 6.67e-11 #Gravitasjonskonstanten m^3k^-1s^-2 (Nm^2/kg^2)
@@ -192,27 +191,29 @@ class integral:
         g = 6.6742e-11*(1.5287e25/8598366.6945**2) #m/s^2
 
         sum_force =self.BoxForceCounter()[1] - g
-        aks = sum_force/self.InitialRocketMass()
+        aks = sum_force/self.InitialRocketMass()[0]
         counter = 0
         esc_vel = self.EscapeVelocity()
         time_sek = (esc_vel-rocket_velocity)/aks
         return time_sek
 
     def OneDimensionalLaunch(self):
-        time = self.TimeToEscapeVel(0)
+        EscVel = self.EscapeVelocity()
+        time = int(self.TimeToEscapeVel(0))
         g = 6.6742e-11*(1.5287e25/8598366.6945**2) #m/s^2
         sum_force =self.BoxForceCounter()[1] - g
-        aks = sum_force/self.InitialRocketMass()
+        aks = sum_force/self.InitialRocketMass()[0]
         dt = 0.01
-        #print(time)
         velocity_array = np.zeros(int(time)+1)
         position_array = np.zeros(int(time)+1)
         time_array = np.zeros(int(time)+1)
-        print(time)
-        for i in range(int(time)):
+        print(aks)
+        for i in range(time):
             velocity_array[i+1] = velocity_array[i] + aks*dt
             position_array[i+1] = position_array[i] + velocity_array[i+1]*dt
-            time_array[i+1] = time_array[i]+1
+            time_array[i+1] = time_array[i]+dt
+            if velocity_array[i] >= EscVel:
+                break
         return velocity_array, position_array, time_array
 """
 #class GetData(integral):
