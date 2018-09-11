@@ -1,0 +1,26 @@
+import numpy as np
+from AST2000SolarSystem import AST2000SolarSystem
+import matplotlib.pyplot as plt
+
+attribute = AST2000SolarSystem(40689)
+a = attribute.a #Planetenes halvakser
+e = attribute.e #eksentrisitet planeter
+theta = np.linspace(0,2*np.pi,360)
+omega = attribute.omega #polar angle initialposition of planets
+psi = attribute.psi #Den polare vinkelen aphelion
+
+def values(e,a,omega,theta):
+    for i in range(360):
+        [r_0,r_1,r_2,r_3,r_4,r_5,r_6] = a*(1-e**2)/(1-e*np.cos(theta[i]-omega))
+    return r_0,r_1,r_2,r_3,r_4,r_5,r_6
+
+v = values(e,a,omega,theta)
+
+plt.plot(v[0]*np.cos(theta), v[0]*np.sin(theta))
+plt.plot(v[1]*np.cos(theta), v[1]*np.sin(theta))
+plt.plot(v[2]*np.cos(theta), v[2]*np.sin(theta))
+plt.plot(v[3]*np.cos(theta), v[3]*np.sin(theta))
+plt.plot(v[4]*np.cos(theta), v[4]*np.sin(theta))
+plt.plot(v[5]*np.cos(theta), v[5]*np.sin(theta))
+plt.plot(v[6]*np.cos(theta), v[6]*np.sin(theta))
+plt.show()
