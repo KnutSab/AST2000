@@ -1,0 +1,52 @@
+import numpy as np
+from AST2000SolarSystem import AST2000SolarSystem
+import matplotlib.pyplot as plt
+
+attribute = AST2000SolarSystem(40689)
+a = attribute.a #Planetenes halvakser
+e = attribute.e #eksentrisitet planeter
+theta = np.linspace(0,2*np.pi,360)
+omega = attribute.omega #polar angle initialposition of planets
+psi = attribute.psi #Den polare vinkelen aphelion
+f_0 = np.zeros(360)
+f_1 = np.zeros(360)
+f_2 = np.zeros(360)
+f_3 = np.zeros(360)
+f_4 = np.zeros(360)
+f_5 = np.zeros(360)
+f_6 = np.zeros(360)
+r_0 = np.zeros(360)
+r_1 = np.zeros(360)
+r_2 = np.zeros(360)
+r_3 = np.zeros(360)
+r_4 = np.zeros(360)
+r_5 = np.zeros(360)
+r_6 = np.zeros(360)
+
+for i in range(len(theta)):
+    f_0[i] = theta[i]-omega[0]
+    f_1[i] = theta[i]-omega[1]
+    f_2[i] = theta[i]-omega[2]
+    f_3[i] = theta[i]-omega[3]
+    f_4[i] = theta[i]-omega[4]
+    f_5[i] = theta[i]-omega[5]
+    f_6[i] = theta[i]-omega[6]
+    r_0[i] = a[0]*(1-e[0]**2)/(1-e[0]*np.cos(f_0[i]))
+    r_1[i] = a[1]*(1-e[1]**2)/(1-e[1]*np.cos(f_1[i]))
+    r_2[i] = a[2]*(1-e[2]**2)/(1-e[2]*np.cos(f_2[i]))
+    r_3[i] = a[3]*(1-e[3]**2)/(1-e[3]*np.cos(f_3[i]))
+    r_4[i] = a[4]*(1-e[4]**2)/(1-e[4]*np.cos(f_4[i]))
+    r_5[i] = a[5]*(1-e[5]**2)/(1-e[5]*np.cos(f_5[i]))
+    r_6[i] = a[6]*(1-e[6]**2)/(1-e[6]*np.cos(f_6[i]))
+x0 = attribute.x0 #x-koordinat for utgangsposisjonen
+y0 = attribute.y0 #y-koordinat for utgangsposisjonen
+
+#ax = plt.subplot(111, projection = 'polar')
+plt.plot(r_0*np.cos(theta), r_0*np.sin(theta))
+plt.plot(r_1*np.cos(theta), r_1*np.sin(theta))
+plt.plot(r_2*np.cos(theta), r_2*np.sin(theta))
+plt.plot(r_3*np.cos(theta), r_3*np.sin(theta))
+plt.plot(r_4*np.cos(theta), r_4*np.sin(theta))
+plt.plot(r_5*np.cos(theta), r_5*np.sin(theta))
+plt.plot(r_6*np.cos(theta), r_6*np.sin(theta))
+plt.show()
