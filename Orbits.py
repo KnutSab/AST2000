@@ -27,6 +27,7 @@ vy0 = attribute.vy0 #y-komponent til farten til planetene
 x0 = attribute.x0 #x-koordinat for utgangsposisjonen
 y0 = attribute.y0 #y-koordinat for utgangsposisjonen
 
+"""
 
 def integrator(x0,y0,vx0,vy0,T,dt):
     N = int(T/dt)
@@ -41,8 +42,9 @@ def integrator(x0,y0,vx0,vy0,T,dt):
     vy = np.zeros(N+1)
     vx[0] = vx0
     vy[0] = vy0
+    pos = np.array((x0,y0))
     for i in range(N):
-        
+        new_pos[i] =
         ax[i] = (-(G*star_mass)/(x[i]**2 + y[i]**2) * (x[i]/(np.sqrt(x[i]**2 + y[i]**2))))
         ay[i] = (-(G*star_mass)/(x[i]**2 + y[i]**2) * (y[i]/(np.sqrt(x[i]**2 + y[i]**2))))
         vx[i+1] = vx[i] + ax[i]*dt
@@ -62,3 +64,29 @@ x6 = integrator(x0[5],y0[5],vx0[5],vy0[5],20,0.00001)[0],integrator(x0[5],y0[5],
 x7 = integrator(x0[6],y0[6],vx0[6],vy0[6],20,0.00001)[0],integrator(x0[6],y0[6],vx0[6],vy0[6],20,0.00001)[1])
 #plt.axis("equal")
 #plt.plot(orbit[0],orbit[1])
+"""
+pos0 = np.array((x0,y0))
+vel0 = np.array((vx0,vy0))
+
+N_planets = number_of_planets
+N_time = 150000
+pos = np.zeros((N_time, 2, N_planets))
+vel = np.zeros((N_time, 2, N_planets))
+a = np.zeros((N_time,2,N_planets))
+G = 4*np.pi**2
+pos[0] = pos0
+vel[0] = vel0
+dt = 0.0001
+for i in range(N_time-1):
+    temp = (-(G*star_mass)/(pos[i,0]**2 + pos[i,1]**2) * (pos[i]/(np.sqrt(pos[i,0]**2 + pos[i,1]**2))))
+    print(temp.shape)
+    print(a[i].shape)
+    a[i] = temp
+
+    vel[i+1] += (vel[i] + a[i]*dt)
+    pos[i+1] += (pos[i] + vel[i+1]*dt)
+print(pos)
+plt.axis("equal")
+plt.plot(pos[:,0],pos[:,1])
+plt.show()
+print(mass)
